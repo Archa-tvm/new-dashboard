@@ -3,9 +3,23 @@ $ErrorActionPreference = "Stop"
 
 $ProjectRoot = $PSScriptRoot
 $ToolsDir = Join-Path $ProjectRoot "..\tools\nodejs"
+$NodeCommand = Join-Path $ToolsDir "node.exe"
+$NpmCommand = Join-Path $ToolsDir "npm.cmd"
 
 if (Test-Path $ToolsDir) {
     $env:PATH = "$ToolsDir;" + $env:PATH
+}
+
+if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+    throw "Python 3 is required but was not found on PATH."
+}
+
+if (-not (Test-Path $NpmCommand)) {
+    $NpmCommand = (Get-Command npm -ErrorAction SilentlyContinue).Source
+}
+
+if (-not $NpmCommand -or -not (Test-Path $NpmCommand)) {
+    throw "Node.js/npm is required. Install Node.js or provide it in tools\nodejs."
 }
 
 Write-Host "==========================================================" -ForegroundColor Cyan
@@ -18,7 +32,7 @@ $BackendProcess = Start-Process -FilePath "python" -ArgumentList "-m uvicorn app
 
 # Check Frontend
 Write-Host "[2/2] Launching React Vite Frontend on http://localhost:5173..." -ForegroundColor Green
-$FrontendProcess = Start-Process -FilePath "npm" -ArgumentList "run dev" -WorkingDirectory (Join-Path $ProjectRoot "frontend") -PassThru
+$FrontendProcess = Start-Process -FilePath $NpmCommand -ArgumentList "run dev" -WorkingDirectory (Join-Path $ProjectRoot "frontend") -PassThru
 
 Write-Host "`nSystem is running!" -ForegroundColor Yellow
 Write-Host "Frontend URL: http://localhost:5173" -ForegroundColor White
