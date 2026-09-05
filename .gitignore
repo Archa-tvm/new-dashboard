@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+backend/__pycache__/
+app/__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing & build outputs
+.pytest_cache/
+frontend/dist/
+dist/
+
+# SQLite databases (local fallback database)
+*.db
+*.sqlite
+*.sqlite3
+test_inspection.db
+inspection_analytics.db
+
+# Environment variables
+.env
+.env.local
+
+# Uploaded temp files (preserve dir)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Operating System Files
+.DS_Store
+Thumbs.db
