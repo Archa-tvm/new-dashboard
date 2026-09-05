@@ -56,6 +56,18 @@ def test_column_auto_detection():
     assert mapping["status"] == "status"
     assert mapping["Reason"] == "invalid_reason"
 
+def test_column_auto_detection_matches_common_excel_headers():
+    cols = ["EventType", "Production Line", "Date & Time", "Status", "Invalid Reason"]
+    mapping, unmapped, missing = auto_detect_columns(cols)
+    assert missing == []
+    assert mapping == {
+        "EventType": "event",
+        "Production Line": "production_line",
+        "Date & Time": "time_of_occurrence",
+        "Status": "status",
+        "Invalid Reason": "invalid_reason"
+    }
+
 def test_empty_kpi_summary(db_session):
     filters = DashboardFilterParams()
     kpis = get_kpi_summary(db_session, filters)

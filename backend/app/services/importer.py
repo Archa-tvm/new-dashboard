@@ -9,10 +9,10 @@ from app.models import InspectionEvent, ImportBatch, HistoricalSummary
 
 COLUMN_ALIASES = {
     "event": ["event", "eventtype", "event_type", "type", "inspection_event", "event_name"],
-    "production_line": ["line", "productionline", "production_line", "prod_line", "line_no", "linename"],
-    "time_of_occurrence": ["timeofoccurrence", "time_of_occurrence", "timestamp", "datetime", "date_time", "time", "date_time_occurrence"],
+    "production_line": ["line", "productionline", "production_line", "production line", "prod_line", "line_no", "linename"],
+    "time_of_occurrence": ["timeofoccurrence", "time_of_occurrence", "timestamp", "datetime", "date_time", "date & time", "date/time", "time", "date_time_occurrence"],
     "status": ["status", "result", "outcome", "inspection_status", "state"],
-    "invalid_reason": ["reason", "invalidreason", "invalid_reason", "comment", "comments", "reasons", "failure_reason"]
+    "invalid_reason": ["reason", "invalidreason", "invalid_reason", "invalid reason", "comment", "comments", "reasons", "failure_reason"]
 }
 
 SUMMARY_ALIASES = {
@@ -26,7 +26,7 @@ SUMMARY_ALIASES = {
 }
 
 def normalize_col_name(col: str) -> str:
-    return re.sub(r'[\s_\-]+', '', str(col).strip().lower())
+    return re.sub(r'[^a-z0-9]+', '', str(col).strip().lower())
 
 def auto_detect_columns(columns: List[str]) -> Tuple[Dict[str, str], List[str], List[str]]:
     """

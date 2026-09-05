@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Columns, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface ColumnMapperModalProps {
@@ -36,6 +36,14 @@ export const ColumnMapperModal: React.FC<ColumnMapperModalProps> = ({
     });
     return init;
   });
+
+  useEffect(() => {
+    const nextMapping: Record<string, string> = {};
+    Object.entries(detectedColumns).forEach(([originalColumn, appField]) => {
+      nextMapping[appField] = originalColumn;
+    });
+    setFieldToCol(nextMapping);
+  }, [detectedColumns, allSpreadsheetColumns]);
 
   if (!isOpen) return null;
 
@@ -106,7 +114,7 @@ export const ColumnMapperModal: React.FC<ColumnMapperModalProps> = ({
                       : 'border-slate-300 focus:ring-blue-500 text-slate-800'
                   }`}
                 >
-                  <option value="">-- Select Column --</option>
+                  <option value="">-- Select matching Excel column --</option>
                   {allSpreadsheetColumns.map(col => (
                     <option key={col} value={col}>{col}</option>
                   ))}
