@@ -5,13 +5,14 @@ from app.database import get_db
 from app.schemas import (
     DashboardFilterParams, KpiSummaryResponse, AccuracyTrendItem,
     DailyPerformanceRow, EventPerformanceCard, OutcomeByDateItem,
-    HighlightsResponse, HourlyActivityItem, InspectionEventSchema
+    HighlightsResponse, HourlyActivityItem, InspectionEventSchema,
+    EventBreakdownRow
 )
 from app.services.analytics import (
     get_kpi_summary, get_accuracy_trend, get_daily_performance,
     get_event_performance, get_outcome_by_date, get_invalid_reasons_analysis,
     get_line_performance, get_hourly_activity, get_highlights_and_insights,
-    get_filter_options, apply_filters
+    get_filter_options, apply_filters, get_event_breakdown_table
 )
 from app.models import InspectionEvent
 
@@ -73,6 +74,10 @@ def get_highlights(filters: DashboardFilterParams = Depends(get_filter_params), 
 @router.get("/filter-options")
 def get_filters(db: Session = Depends(get_db)):
     return get_filter_options(db)
+
+@router.get("/event-breakdown", response_model=List[EventBreakdownRow])
+def get_breakdown(filters: DashboardFilterParams = Depends(get_filter_params), db: Session = Depends(get_db)):
+    return get_event_breakdown_table(db, filters)
 
 @router.get("/recent-events")
 def get_recent_events(limit: int = 10, db: Session = Depends(get_db)):

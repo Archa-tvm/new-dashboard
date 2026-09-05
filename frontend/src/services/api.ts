@@ -3,7 +3,7 @@ import {
   DailyPerformanceRow, EventPerformanceCard, OutcomeByDateItem,
   LinePerformanceItem, HourlyActivityItem, HighlightsData,
   PaginatedEvents, InspectionEvent, ImportBatch, FileAnalysisPreview,
-  SettingsData
+  SettingsData, EventBreakdownRow
 } from '../types';
 
 const API_BASE = '/api';
@@ -89,6 +89,12 @@ export const api = {
   async getRecentEvents(limit: number = 10): Promise<InspectionEvent[]> {
     const res = await fetch(`${API_BASE}/dashboard/recent-events?limit=${limit}`);
     if (!res.ok) throw new Error('Failed to load recent events');
+    return res.json();
+  },
+
+  async getEventBreakdown(filters: FilterState): Promise<EventBreakdownRow[]> {
+    const res = await fetch(`${API_BASE}/dashboard/event-breakdown${buildQuery(filters)}`);
+    if (!res.ok) throw new Error('Failed to load event breakdown');
     return res.json();
   },
 

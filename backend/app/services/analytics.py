@@ -5,7 +5,7 @@ from sqlalchemy import func, and_
 from app.models import InspectionEvent, HistoricalSummary, SystemSetting
 from app.schemas import (
     DashboardFilterParams, KpiSummaryResponse, AccuracyTrendItem,
-    DailyPerformanceRow, EventPerformanceCard, OutcomeByDateItem,
+    DailyPerformanceRow, EventBreakdownRow, EventPerformanceCard, OutcomeByDateItem,
     InvalidReasonItem, InvalidReasonByEventRow, InvalidReasonTrendItem,
     LinePerformanceItem, HourlyActivityItem, HighlightsResponse
 )
@@ -705,3 +705,58 @@ def get_filter_options(db: Session) -> Dict[str, Any]:
             "max_date": max_date.strftime("%Y-%m-%d") if max_date else None
         }
     }
+
+def get_event_breakdown_table(db: Session, filters: DashboardFilterParams) -> List[EventBreakdownRow]:
+    dates = get_all_dates_in_range(db, filters)
+    if not dates:
+        return []
+
+    base_query = db.query(InspectionEvent)
+    base_query = apply_filters(base_query, filters)
+    events = base_query.all()
+
+    by_date_event = {}
+    for d in dates:
+        d_str = d.strftime("%Y-%m-%d")
+        by_date_event[d_str] = {
+            "formatted_date": d.strftime("%B %d"),
+            "events": {}
+        }
+
+    for ev in events:
+        d_str = ev.time_of_occurrence.strftime("%Y-%m-%d")
+        if d_str in by_date_event:
+            ev_dict = by_date_event[d_str]["events"]
+            if ev.event not in ev_dict:
+                ev_dict[ev.event] = {"tp": 0, "fp": 0, "pp": 0}
+            ev_dict[ev.event]["pp"] += 1
+            if ev.status == "valid":
+                ev_dict[ev.event]["tp"] += 1
+            else:
+                ev_dict[ev.event]["fp"] += 1
+
+    rows = []
+    for d_str, d_info in by_date_event.items():
+        ev_dict = d_info["events"]
+        # Prioritize OPSPD then HNDPOS
+        sorted_events = sorted(ev_dict.keys(), key=lambda x: (0 if x == "OPSPD" else (1 if x == "HNDPOS" else 2), x))
+        for idx, ev_name in enumerate(sorted_events):
+            stats = ev_dict[ev_name]
+            pp = stats["pp"]
+            tp = stats["tp"]
+            fp = stats["fp"]
+            pct = round((tp / pp) * 100, 2) if pp > 0 else None
+            rows.append(EventBreakdownRow(
+                date=d_str,
+                formatted_date=d_info["formatted_date"],
+                is_first_in_date=(idx == 0),
+                event=ev_name,
+                pp=pp,
+                tp=tp,
+                fp=fp,
+                fn=None,
+                percentage=pct
+            ))
+
+    return rows
+

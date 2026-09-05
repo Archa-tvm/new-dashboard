@@ -60,6 +60,18 @@ export interface DailyPerformanceRow {
   status: 'Good' | 'Warning' | 'Critical' | 'No Data';
 }
 
+export interface EventBreakdownRow {
+  date: string;
+  formatted_date: string;
+  is_first_in_date: boolean;
+  event: string;
+  pp: number;
+  tp: number;
+  fp: number;
+  fn: string | null;
+  percentage: number | null;
+}
+
 export interface EventPerformanceCard {
   event: string;
   accuracy: number | null;

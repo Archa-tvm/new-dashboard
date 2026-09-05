@@ -54,6 +54,18 @@ class DailyPerformanceRow(BaseModel):
     overall_accuracy: Optional[float] = None
     status: str # "Good", "Warning", "Critical", "No Data"
 
+# Event Breakdown Row (Date, Event, PP, TP, FP, FN, Percentage)
+class EventBreakdownRow(BaseModel):
+    date: str
+    formatted_date: str
+    is_first_in_date: bool
+    event: str
+    pp: int
+    tp: int
+    fp: int
+    fn: Optional[str] = None
+    percentage: Optional[float] = None
+
 # Event Performance Card
 class EventPerformanceCard(BaseModel):
     event: str

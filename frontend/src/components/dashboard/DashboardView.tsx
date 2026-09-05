@@ -10,12 +10,14 @@ import {
   LinePerformanceItem,
   HourlyActivityItem,
   HighlightsData,
-  InspectionEvent
+  InspectionEvent,
+  EventBreakdownRow
 } from '../../types';
 import { KpiCards } from './KpiCards';
 import { AccuracyTrendChart } from './AccuracyTrendChart';
 import { EventPerformanceCards } from './EventPerformanceCards';
 import { DailyPerformanceTable } from './DailyPerformanceTable';
+import { EventBreakdownTable } from './EventBreakdownTable';
 import { OutcomeBarChart } from './OutcomeBarChart';
 import { InvalidReasonSection } from './InvalidReasonSection';
 import { LinePerformance } from './LinePerformance';
@@ -53,6 +55,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [hourlyData, setHourlyData] = useState<HourlyActivityItem[]>([]);
   const [highlights, setHighlights] = useState<HighlightsData | null>(null);
   const [recentEvents, setRecentEvents] = useState<InspectionEvent[]>([]);
+  const [breakdownData, setBreakdownData] = useState<EventBreakdownRow[]>([]);
 
   const loadAllDashboardData = async () => {
     setLoading(true);
@@ -67,7 +70,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         lineRes,
         hourlyRes,
         highlightsRes,
-        recentRes
+        recentRes,
+        breakdownRes
       ] = await Promise.all([
         api.getSummary(appliedFilters),
         api.getTrend(appliedFilters),
@@ -78,7 +82,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         api.getLineSummary(appliedFilters),
         api.getHourly(appliedFilters),
         api.getHighlights(appliedFilters),
-        api.getRecentEvents(10)
+        api.getRecentEvents(10),
+        api.getEventBreakdown(appliedFilters)
       ]);
 
       setKpiSummary(summaryRes);
@@ -91,6 +96,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       setHourlyData(hourlyRes);
       setHighlights(highlightsRes);
       setRecentEvents(recentRes);
+      setBreakdownData(breakdownRes);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
@@ -152,6 +158,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <OutcomeBarChart data={outcomeData} />
         </div>
       </div>
+
+      {/* 5b. Event PP/TP/FP/FN Breakdown Table */}
+      <EventBreakdownTable data={breakdownData} loading={loading} />
 
       {/* 6. Comprehensive Invalid Reason Analysis Section */}
       {reasonData && (
