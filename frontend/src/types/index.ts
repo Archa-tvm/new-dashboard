@@ -61,21 +61,21 @@ export interface DailyPerformanceRow {
 }
 
 export interface EventBreakdownRow {
-
-  export interface MonthlyAccuracyRow {
-    month: string;
-    formatted_month: string;
-    is_first_in_month: boolean;
-    event: string;
-    pp: number;
-    tp: number;
-    fp: number;
-    fn: string | null;
-    percentage: number | null;
-  }
   date: string;
   formatted_date: string;
   is_first_in_date: boolean;
+  event: string;
+  pp: number;
+  tp: number;
+  fp: number;
+  fn: string | null;
+  percentage: number | null;
+}
+
+export interface MonthlyAccuracyRow {
+  month: string;
+  formatted_month: string;
+  is_first_in_month: boolean;
   event: string;
   pp: number;
   tp: number;

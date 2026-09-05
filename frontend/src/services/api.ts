@@ -94,14 +94,14 @@ export const api = {
   },
 
   async getEventBreakdown(filters: FilterState): Promise<EventBreakdownRow[]> {
-
-      async getMonthlyAccuracy(filters: FilterState): Promise<MonthlyAccuracyRow[]> {
-        const res = await fetch(`${API_BASE}/dashboard/monthly-accuracy${buildQuery(filters)}`);
-        if (!res.ok) throw new Error('Failed to load monthly accuracy');
-        return res.json();
-      },
     const res = await fetch(`${API_BASE}/dashboard/event-breakdown${buildQuery(filters)}`);
     if (!res.ok) throw new Error('Failed to load event breakdown');
+    return res.json();
+  },
+
+  async getMonthlyAccuracy(filters: FilterState): Promise<MonthlyAccuracyRow[]> {
+    const res = await fetch(`${API_BASE}/dashboard/monthly-accuracy${buildQuery(filters)}`);
+    if (!res.ok) throw new Error('Failed to load monthly accuracy');
     return res.json();
   },
 
