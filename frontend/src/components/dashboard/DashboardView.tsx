@@ -57,9 +57,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
           totalInvalid={reasonData.total_invalid || 0}
           invalidRate={reasonData.invalid_rate}
           distribution={reasonData.distribution || []}
-          byEvent={reasonData.by_event || []}
-          trend={reasonData.trend || []}
-          topInsight={reasonData.top_insight}
         />
       )}
     </div>

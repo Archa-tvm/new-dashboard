@@ -708,44 +708,6 @@ def get_filter_options(db: Session) -> Dict[str, Any]:
     }
 
 def get_event_breakdown_table(db: Session, filters: DashboardFilterParams) -> List[EventBreakdownRow]:
-
-    def get_monthly_accuracy(db: Session, filters: DashboardFilterParams) -> List[MonthlyAccuracyRow]:
-        query = apply_filters(db.query(InspectionEvent), filters)
-        events = query.order_by(InspectionEvent.time_of_occurrence.asc()).all()
-        grouped: Dict[str, Dict[str, Dict[str, int]]] = {}
-
-        for inspection in events:
-            month_key = inspection.time_of_occurrence.strftime("%Y-%m")
-            month_events = grouped.setdefault(month_key, {})
-            counts = month_events.setdefault(inspection.event, {"pp": 0, "tp": 0, "fp": 0})
-            counts["pp"] += 1
-            if inspection.status == "valid":
-                counts["tp"] += 1
-            else:
-                counts["fp"] += 1
-
-        rows: List[MonthlyAccuracyRow] = []
-        for month_key, month_events in grouped.items():
-            sorted_events = sorted(
-                month_events,
-                key=lambda name: (0 if name == "OPSPD" else (1 if name == "HNDPOS" else 2), name)
-            )
-            for index, event_name in enumerate(sorted_events):
-                counts = month_events[event_name]
-                percentage = round((counts["tp"] / counts["pp"]) * 100, 2) if counts["pp"] else None
-                month_date = datetime.strptime(month_key, "%Y-%m")
-                rows.append(MonthlyAccuracyRow(
-                    month=month_key,
-                    formatted_month=month_date.strftime("%B %Y"),
-                    is_first_in_month=index == 0,
-                    event=event_name,
-                    pp=counts["pp"],
-                    tp=counts["tp"],
-                    fp=counts["fp"],
-                    fn=None,
-                    percentage=percentage
-                ))
-        return rows
     dates = get_all_dates_in_range(db, filters)
     if not dates:
         return []
@@ -797,5 +759,42 @@ def get_event_breakdown_table(db: Session, filters: DashboardFilterParams) -> Li
                 percentage=pct
             ))
 
+    return rows
+
+def get_monthly_accuracy(db: Session, filters: DashboardFilterParams) -> List[MonthlyAccuracyRow]:
+    query = apply_filters(db.query(InspectionEvent), filters)
+    events = query.order_by(InspectionEvent.time_of_occurrence.asc()).all()
+    grouped: Dict[str, Dict[str, Dict[str, int]]] = {}
+
+    for inspection in events:
+        month_key = inspection.time_of_occurrence.strftime("%Y-%m")
+        month_events = grouped.setdefault(month_key, {})
+        counts = month_events.setdefault(inspection.event, {"pp": 0, "tp": 0, "fp": 0})
+        counts["pp"] += 1
+        if inspection.status == "valid":
+            counts["tp"] += 1
+        else:
+            counts["fp"] += 1
+
+    rows: List[MonthlyAccuracyRow] = []
+    for month_key, month_events in grouped.items():
+        sorted_events = sorted(
+            month_events,
+            key=lambda name: (0 if name == "OPSPD" else (1 if name == "HNDPOS" else 2), name)
+        )
+        for index, event_name in enumerate(sorted_events):
+            counts = month_events[event_name]
+            pp = counts["pp"]
+            rows.append(MonthlyAccuracyRow(
+                month=month_key,
+                formatted_month=datetime.strptime(month_key, "%Y-%m").strftime("%B %Y"),
+                is_first_in_month=index == 0,
+                event=event_name,
+                pp=pp,
+                tp=counts["tp"],
+                fp=counts["fp"],
+                fn=None,
+                percentage=round((counts["tp"] / pp) * 100, 2) if pp else None
+            ))
     return rows
 

@@ -77,7 +77,7 @@ export const ColumnMapperModal: React.FC<ColumnMapperModalProps> = ({
           <div>
             <h3 className="text-base font-bold text-slate-900 tracking-tight">Map Spreadsheet Columns</h3>
             <p className="text-xs text-slate-500">
-              Align your spreadsheet header names with system inspection schema
+              Use the raw inspection sheet: Event, Line, TimeOfOccurrence, status, and Reason
             </p>
           </div>
         </div>
