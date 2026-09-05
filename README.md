@@ -53,6 +53,10 @@ An industrial-grade, AI-powered Quality Monitoring & Analytics Platform for manu
 
 ## 🚀 Quick Start Guide
 
+### Local Application Links
+- Frontend dashboard: http://localhost:5173
+- Backend API documentation: http://127.0.0.1:8000/docs
+
 ### 1. Requirements
 - Python 3.10+
 - Node.js 18+ (Node.js LTS is pre-bundled in `scratch/tools/nodejs`)
