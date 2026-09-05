@@ -12,6 +12,7 @@ import {
   HighlightsData,
   InspectionEvent,
   EventBreakdownRow
+  , MonthlyAccuracyRow
 } from '../../types';
 import { KpiCards } from './KpiCards';
 import { AccuracyTrendChart } from './AccuracyTrendChart';
@@ -56,6 +57,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [highlights, setHighlights] = useState<HighlightsData | null>(null);
   const [recentEvents, setRecentEvents] = useState<InspectionEvent[]>([]);
   const [breakdownData, setBreakdownData] = useState<EventBreakdownRow[]>([]);
+  const [monthlyAccuracy, setMonthlyAccuracy] = useState<MonthlyAccuracyRow[]>([]);
 
   const loadAllDashboardData = async () => {
     setLoading(true);
@@ -72,6 +74,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         highlightsRes,
         recentRes,
         breakdownRes
+        , monthlyAccuracyRes
       ] = await Promise.all([
         api.getSummary(appliedFilters),
         api.getTrend(appliedFilters),
@@ -84,6 +87,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         api.getHighlights(appliedFilters),
         api.getRecentEvents(10),
         api.getEventBreakdown(appliedFilters)
+        , api.getMonthlyAccuracy(appliedFilters)
       ]);
 
       setKpiSummary(summaryRes);
@@ -97,6 +101,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       setHighlights(highlightsRes);
       setRecentEvents(recentRes);
       setBreakdownData(breakdownRes);
+      setMonthlyAccuracy(monthlyAccuracyRes);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
@@ -160,7 +165,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* 5b. Event PP/TP/FP/FN Breakdown Table */}
-      <EventBreakdownTable data={breakdownData} loading={loading} />
+      <EventBreakdownTable data={monthlyAccuracy} loading={loading} />
 
       {/* 6. Comprehensive Invalid Reason Analysis Section */}
       {reasonData && (

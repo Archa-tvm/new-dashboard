@@ -66,6 +66,18 @@ class EventBreakdownRow(BaseModel):
     fn: Optional[str] = None
     percentage: Optional[float] = None
 
+# Monthly accuracy row grouped by month and inspection event
+class MonthlyAccuracyRow(BaseModel):
+    month: str
+    formatted_month: str
+    is_first_in_month: bool
+    event: str
+    pp: int
+    tp: int
+    fp: int
+    fn: Optional[str] = None
+    percentage: Optional[float] = None
+
 # Event Performance Card
 class EventPerformanceCard(BaseModel):
     event: str
