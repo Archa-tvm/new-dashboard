@@ -137,7 +137,7 @@ export const DataPreviewModal: React.FC<DataPreviewModalProps> = ({
                     {preview.duplicate_count} duplicate events detected.
                   </div>
                   <div className="text-amber-800 mt-0.5">
-                    Matching (Event + Production Line + TimeOfOccurrence).
+                    Matching Event + Line + the complete date and time in TimeOfOccurrence.
                   </div>
                 </div>
               </div>

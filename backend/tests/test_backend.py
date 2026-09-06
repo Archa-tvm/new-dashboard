@@ -69,6 +69,11 @@ def test_column_auto_detection_matches_common_excel_headers():
         "Invalid Reason": "invalid_reason"
     }
 
+def test_column_auto_detection_maps_unnamed_remarks_column():
+    mapping, unmapped, missing = auto_detect_columns(["Event", "Line", "TimeOfOccurrence", "status", "Unnamed: 4"])
+    assert missing == []
+    assert mapping["Unnamed: 4"] == "invalid_reason"
+
 def test_empty_kpi_summary(db_session):
     filters = DashboardFilterParams()
     kpis = get_kpi_summary(db_session, filters)

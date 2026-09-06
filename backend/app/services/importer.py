@@ -53,6 +53,17 @@ def auto_detect_columns(columns: List[str]) -> Tuple[Dict[str, str], List[str], 
             if matched:
                 break
 
+    # Some Excel files have a blank fifth header rendered by pandas as
+    # "Unnamed: 4" while still containing invalid remarks in that column.
+    if "invalid_reason" not in used_app_fields:
+        unnamed_columns = [
+            col for col in columns
+            if normalize_col_name(col).startswith("unnamed") or not str(col).strip()
+        ]
+        if unnamed_columns:
+            mapping[unnamed_columns[0]] = "invalid_reason"
+            used_app_fields.add("invalid_reason")
+
     required = ["event", "production_line", "time_of_occurrence", "status"]
     missing_required = [f for f in required if f not in used_app_fields]
     unmapped = [c for c in columns if c not in mapping]
