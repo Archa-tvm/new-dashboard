@@ -110,7 +110,7 @@ export const ImportView: React.FC = () => {
   };
 
   const handleDeleteBatch = async (id: number) => {
-    if (window.confirm('Delete this import batch and all of its inspection records?')) {
+    if (window.confirm('Delete this uploaded sheet and all inspection records imported from it? This cannot be undone.')) {
       try {
         await api.deleteImportBatch(id);
         fetchHistory();

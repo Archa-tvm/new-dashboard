@@ -12,7 +12,7 @@ COLUMN_ALIASES = {
     "production_line": ["line", "productionline", "production_line", "production line", "prod_line", "line_no", "linename"],
     "time_of_occurrence": ["timeofoccurrence", "time_of_occurrence", "timestamp", "datetime", "date_time", "date & time", "date/time", "time", "date_time_occurrence"],
     "status": ["status", "result", "outcome", "inspection_status", "state"],
-    "invalid_reason": ["reason", "invalidreason", "invalid_reason", "invalid reason", "comment", "comments", "reasons", "failure_reason"]
+    "invalid_reason": ["reason", "remarks", "remark", "invalidreason", "invalid_reason", "invalid reason", "comment", "comments", "reasons", "failure_reason"]
 }
 
 SUMMARY_ALIASES = {

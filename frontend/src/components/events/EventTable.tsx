@@ -6,7 +6,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  Eye
+  Eye,
+  Edit3,
+  Save,
+  X
 } from 'lucide-react';
 import { InspectionEvent } from '../../types';
 import { api } from '../../services/api';
@@ -18,7 +21,7 @@ interface EventTableProps {
 }
 
 export const EventTable: React.FC<EventTableProps> = ({ onSelectEvent }) => {
-  const { appliedFilters, options } = useFilters();
+  const { appliedFilters, options, refresh } = useFilters();
   const [events, setEvents] = useState<InspectionEvent[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -28,6 +31,10 @@ export const EventTable: React.FC<EventTableProps> = ({ onSelectEvent }) => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [editingEvent, setEditingEvent] = useState<InspectionEvent | null>(null);
+  const [editForm, setEditForm] = useState({ event: '', production_line: '', time_of_occurrence: '', status: 'valid', invalid_reason: '' });
+  const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   // Local filters inside Events page
   const [localLine, setLocalLine] = useState(appliedFilters.production_line);
@@ -102,8 +109,38 @@ export const EventTable: React.FC<EventTableProps> = ({ onSelectEvent }) => {
       production_line: localLine !== 'All Lines' ? localLine : undefined,
       event: localEvent !== 'All Events' ? localEvent : undefined,
       status: localStatus !== 'All' ? localStatus : undefined,
+      invalid_reason: appliedFilters.invalid_reason !== 'All Reasons' ? appliedFilters.invalid_reason : undefined,
     });
     window.open(exportUrl, '_blank');
+  };
+
+  const beginEdit = (event: InspectionEvent) => {
+    setEditingEvent(event);
+    setEditError(null);
+    setEditForm({
+      event: event.event,
+      production_line: event.production_line,
+      time_of_occurrence: event.time_of_occurrence.slice(0, 16),
+      status: event.status,
+      invalid_reason: event.invalid_reason || ''
+    });
+  };
+
+  const saveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEvent) return;
+    setSaving(true);
+    setEditError(null);
+    try {
+      await api.updateEvent(editingEvent.id, editForm);
+      setEditingEvent(null);
+      refresh();
+      fetchEvents();
+    } catch (err: any) {
+      setEditError(err.message || 'Failed to update event');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -167,6 +204,29 @@ export const EventTable: React.FC<EventTableProps> = ({ onSelectEvent }) => {
           </button>
         </div>
       </div>
+
+      {editingEvent && (
+        <form onSubmit={saveEdit} className="bg-white rounded-xl border border-blue-200 p-4 shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-900">Edit inspection record</h3>
+            <button type="button" onClick={() => setEditingEvent(null)} className="p-1 text-slate-400 hover:text-slate-700" title="Cancel edit"><X className="w-4 h-4" /></button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <input aria-label="Event" value={editForm.event} onChange={e => setEditForm({ ...editForm, event: e.target.value })} placeholder="Event" className="px-2.5 py-2 rounded-lg border border-slate-300 text-xs" required />
+            <input aria-label="Production line" value={editForm.production_line} onChange={e => setEditForm({ ...editForm, production_line: e.target.value })} placeholder="Production line" className="px-2.5 py-2 rounded-lg border border-slate-300 text-xs" required />
+            <input aria-label="Time of occurrence" type="datetime-local" value={editForm.time_of_occurrence} onChange={e => setEditForm({ ...editForm, time_of_occurrence: e.target.value })} className="px-2.5 py-2 rounded-lg border border-slate-300 text-xs" required />
+            <select aria-label="Status" value={editForm.status} onChange={e => setEditForm({ ...editForm, status: e.target.value })} className="px-2.5 py-2 rounded-lg border border-slate-300 text-xs">
+              <option value="valid">Valid</option>
+              <option value="invalid">Invalid</option>
+            </select>
+            <input aria-label="Remarks" value={editForm.invalid_reason} onChange={e => setEditForm({ ...editForm, invalid_reason: e.target.value })} placeholder="Remarks" className="px-2.5 py-2 rounded-lg border border-slate-300 text-xs" />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-rose-600">{editError || ''}</span>
+            <button type="submit" disabled={saving} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 disabled:opacity-50"><Save className="w-3.5 h-3.5" />{saving ? 'Saving...' : 'Save changes'}</button>
+          </div>
+        </form>
+      )}
 
       {/* Table Container */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
@@ -278,13 +338,10 @@ export const EventTable: React.FC<EventTableProps> = ({ onSelectEvent }) => {
                         {ev.source_row}
                       </td>
                       <td className="py-2.5 px-3 text-right">
-                        <button
-                          onClick={() => onSelectEvent(ev)}
-                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>View</span>
-                        </button>
+                        <div className="inline-flex items-center gap-2">
+                          <button onClick={() => beginEdit(ev)} title="Edit record" className="text-amber-600 hover:text-amber-800"><Edit3 className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => onSelectEvent(ev)} className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold"><Eye className="w-3.5 h-3.5" /><span>View</span></button>
+                        </div>
                       </td>
                     </tr>
                   );

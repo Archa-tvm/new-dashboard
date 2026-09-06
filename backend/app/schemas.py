@@ -166,6 +166,13 @@ class InspectionEventSchema(BaseModel):
 
     model_config = {"from_attributes": True}
 
+class InspectionEventUpdate(BaseModel):
+    event: str
+    production_line: str
+    time_of_occurrence: datetime
+    status: str
+    invalid_reason: Optional[str] = None
+
 # Paginated Events Response
 class PaginatedEventsResponse(BaseModel):
     total: int

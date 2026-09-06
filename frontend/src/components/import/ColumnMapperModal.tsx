@@ -16,7 +16,7 @@ const APP_FIELDS = [
   { key: 'production_line', label: 'Production Line', required: true },
   { key: 'time_of_occurrence', label: 'Date & Time / Timestamp', required: true },
   { key: 'status', label: 'Status (Valid / Invalid)', required: true },
-  { key: 'invalid_reason', label: 'Invalid Reason / Comment', required: false },
+  { key: 'invalid_reason', label: 'Remarks / Invalid Reason', required: false },
 ];
 
 export const ColumnMapperModal: React.FC<ColumnMapperModalProps> = ({

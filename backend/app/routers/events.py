@@ -8,7 +8,7 @@ import pandas as pd
 import io
 from app.database import get_db
 from app.models import InspectionEvent
-from app.schemas import DashboardFilterParams, PaginatedEventsResponse, InspectionEventSchema
+from app.schemas import DashboardFilterParams, PaginatedEventsResponse, InspectionEventSchema, InspectionEventUpdate
 
 router = APIRouter(prefix="/events", tags=["Events"])
 
@@ -155,7 +155,7 @@ def export_events(
             "Event": r.event,
             "Production Line": r.production_line,
             "Status": r.status.upper(),
-            "Invalid Reason": r.invalid_reason or "—",
+            "Remarks": r.invalid_reason or "—",
             "Source File": r.source_file,
             "Source Row": r.source_row
         })
@@ -179,6 +179,38 @@ def get_event_detail(event_id: int, db: Session = Depends(get_db)):
         production_line=ev.production_line,
         time_of_occurrence=ev.time_of_occurrence,
         date_str=ev.time_of_occurrence.strftime("%d %B %Y"),
+        time_str=ev.time_of_occurrence.strftime("%H:%M:%S"),
+        status=ev.status,
+        invalid_reason=ev.invalid_reason,
+        source_file=ev.source_file,
+        source_row=ev.source_row,
+        created_at=ev.created_at
+    )
+
+@router.put("/{event_id}", response_model=InspectionEventSchema)
+def update_event(event_id: int, payload: InspectionEventUpdate, db: Session = Depends(get_db)):
+    ev = db.query(InspectionEvent).filter(InspectionEvent.id == event_id).first()
+    if not ev:
+        raise HTTPException(status_code=404, detail="Event not found")
+    status = payload.status.strip().lower()
+    if status not in ("valid", "invalid"):
+        raise HTTPException(status_code=400, detail="Status must be valid or invalid")
+    if not payload.event.strip() or not payload.production_line.strip():
+        raise HTTPException(status_code=400, detail="Event and production line are required")
+
+    ev.event = payload.event.strip()
+    ev.production_line = payload.production_line.strip()
+    ev.time_of_occurrence = payload.time_of_occurrence
+    ev.status = status
+    ev.invalid_reason = payload.invalid_reason.strip() if status == "invalid" and payload.invalid_reason else None
+    db.commit()
+    db.refresh(ev)
+    return InspectionEventSchema(
+        id=ev.id,
+        event=ev.event,
+        production_line=ev.production_line,
+        time_of_occurrence=ev.time_of_occurrence,
+        date_str=ev.time_of_occurrence.strftime("%d %b %Y"),
         time_str=ev.time_of_occurrence.strftime("%H:%M:%S"),
         status=ev.status,
         invalid_reason=ev.invalid_reason,

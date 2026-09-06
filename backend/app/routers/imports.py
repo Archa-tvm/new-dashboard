@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, List, Dict
 from app.database import get_db
 from app.config import settings
-from app.models import ImportBatch, InspectionEvent
+from app.models import ImportBatch, InspectionEvent, HistoricalSummary
 from app.schemas import (
     FileAnalysisPreview, ImportExecutionRequest, ImportExecutionResponse, ImportBatchSchema
 )
@@ -103,6 +103,10 @@ def delete_batch(batch_id: int, db: Session = Depends(get_db)):
     b = db.query(ImportBatch).filter(ImportBatch.id == batch_id).first()
     if not b:
         raise HTTPException(status_code=404, detail="Batch not found")
+    # Delete children explicitly so this also works with SQLite deployments where
+    # database-level foreign-key cascades may not be enabled.
+    db.query(InspectionEvent).filter(InspectionEvent.source_import_id == batch_id).delete(synchronize_session=False)
+    db.query(HistoricalSummary).filter(HistoricalSummary.source_import_id == batch_id).delete(synchronize_session=False)
     db.delete(b)
     db.commit()
     return {"success": True, "message": f"Deleted batch {batch_id} and its associated records."}

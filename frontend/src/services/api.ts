@@ -118,6 +118,25 @@ export const api = {
     return res.json();
   },
 
+  async updateEvent(id: number, data: {
+    event: string;
+    production_line: string;
+    time_of_occurrence: string;
+    status: string;
+    invalid_reason: string;
+  }): Promise<InspectionEvent> {
+    const res = await fetch(`${API_BASE}/events/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to update event' }));
+      throw new Error(err.detail || 'Failed to update event');
+    }
+    return res.json();
+  },
+
   getExportEventsUrl(filters: Record<string, any>): string {
     return `${API_BASE}/events/export${buildQuery(filters)}`;
   },

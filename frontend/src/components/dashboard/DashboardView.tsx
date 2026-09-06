@@ -6,6 +6,7 @@ import { KpiCards } from './KpiCards';
 import { InvalidReasonSection } from './InvalidReasonSection';
 import { EmptyState } from '../common/EmptyState';
 import { InspectionSummaryTable } from './InspectionSummaryTable';
+import { InvalidInspectionsTable } from './InvalidInspectionsTable';
 
 interface DashboardViewProps {
   onNavigateToImport: () => void;
@@ -19,19 +20,33 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
   const [summary, setSummary] = useState<KpiSummary | null>(null);
   const [reasonData, setReasonData] = useState<any>(null);
   const [breakdown, setBreakdown] = useState<EventBreakdownRow[]>([]);
+  const [invalidEvents, setInvalidEvents] = useState<InspectionEvent[]>([]);
 
   useEffect(() => {
     const loadSummary = async () => {
       setLoading(true);
       try {
-        const [summaryResponse, reasonsResponse, breakdownResponse] = await Promise.all([
+        const [summaryResponse, reasonsResponse, breakdownResponse, invalidEventsResponse] = await Promise.all([
           api.getSummary(appliedFilters),
           api.getInvalidReasons(appliedFilters),
-          api.getEventBreakdown(appliedFilters)
+          api.getEventBreakdown(appliedFilters),
+          api.getEvents({
+            page: 1,
+            page_size: 100,
+            start_date: appliedFilters.start_date,
+            end_date: appliedFilters.end_date,
+            production_line: appliedFilters.production_line !== 'All Lines' ? appliedFilters.production_line : undefined,
+            event: appliedFilters.event !== 'All Events' ? appliedFilters.event : undefined,
+            status: 'Invalid',
+            invalid_reason: appliedFilters.invalid_reason !== 'All Reasons' ? appliedFilters.invalid_reason : undefined,
+            sort_by: 'time_of_occurrence',
+            sort_order: 'desc'
+          })
         ]);
         setSummary(summaryResponse);
         setReasonData(reasonsResponse);
         setBreakdown(breakdownResponse);
+        setInvalidEvents(invalidEventsResponse.items);
       } catch (error) {
         console.error('Failed to load inspection summary:', error);
       } finally {
@@ -64,6 +79,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
         />
       )}
       <InspectionSummaryTable data={breakdown} loading={loading} />
+      <InvalidInspectionsTable events={invalidEvents} loading={loading} />
     </div>
   );
 };

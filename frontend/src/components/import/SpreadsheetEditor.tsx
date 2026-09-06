@@ -59,7 +59,7 @@ export const SpreadsheetEditor: React.FC<SpreadsheetEditorProps> = ({ onImport, 
     if (!populatedRows.length) return;
 
     const csv = [
-      ['Event', 'Line', 'TimeOfOccurrence', 'status', 'invalid reason'],
+      ['Event', 'Line', 'TimeOfOccurrence', 'status', 'Remarks'],
       ...populatedRows.map(row => [row.event, row.line, row.time, row.status, row.reason])
     ].map(row => row.map(escapeCsv).join(',')).join('\n');
     onImport(new File([csv], 'manual_inspection_sheet.csv', { type: 'text/csv' }));
@@ -93,7 +93,7 @@ export const SpreadsheetEditor: React.FC<SpreadsheetEditorProps> = ({ onImport, 
               <th className="px-3 py-2 text-left">Line</th>
               <th className="px-3 py-2 text-left">TimeOfOccurrence</th>
               <th className="px-3 py-2 text-left">Status</th>
-              <th className="px-3 py-2 text-left">Invalid reason</th>
+              <th className="px-3 py-2 text-left">Remarks</th>
               <th className="w-10" />
             </tr>
           </thead>
