@@ -127,11 +127,22 @@ def get_all_dates_in_range(db: Session, filters: DashboardFilterParams) -> List[
     min_date = query.order_by(InspectionEvent.time_of_occurrence.asc()).first()
     max_date = query.order_by(InspectionEvent.time_of_occurrence.desc()).first()
 
-    if not min_date or not max_date:
-        return []
+    start = min_date[0].date() if min_date else None
+    end = max_date[0].date() if max_date else None
 
-    start = min_date[0].date()
-    end = max_date[0].date()
+    if filters.start_date:
+        try:
+            start = datetime.strptime(filters.start_date, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+    if filters.end_date:
+        try:
+            end = datetime.strptime(filters.end_date, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+
+    if not start or not end or start > end:
+        return []
 
     dates = []
     curr = start
@@ -715,6 +726,7 @@ def get_event_breakdown_table(db: Session, filters: DashboardFilterParams) -> Li
     base_query = db.query(InspectionEvent)
     base_query = apply_filters(base_query, filters)
     events = base_query.all()
+    event_names = {ev.event for ev in events if ev.event}
 
     by_date_event = {}
     for d in dates:
@@ -739,6 +751,8 @@ def get_event_breakdown_table(db: Session, filters: DashboardFilterParams) -> Li
     rows = []
     for d_str, d_info in by_date_event.items():
         ev_dict = d_info["events"]
+        for event_name in event_names:
+            ev_dict.setdefault(event_name, {"tp": 0, "fp": 0, "pp": 0})
         # Prioritize OPSPD then HNDPOS
         sorted_events = sorted(ev_dict.keys(), key=lambda x: (0 if x == "OPSPD" else (1 if x == "HNDPOS" else 2), x))
         for idx, ev_name in enumerate(sorted_events):
@@ -746,7 +760,7 @@ def get_event_breakdown_table(db: Session, filters: DashboardFilterParams) -> Li
             pp = stats["pp"]
             tp = stats["tp"]
             fp = stats["fp"]
-            pct = round((tp / pp) * 100, 2) if pp > 0 else None
+            pct = round((tp / pp) * 100, 2) if pp > 0 else 0.0
             rows.append(EventBreakdownRow(
                 date=d_str,
                 formatted_date=d_info["formatted_date"],

@@ -15,7 +15,7 @@ export const OverallEventSummaryTable: React.FC<OverallEventSummaryTableProps> =
       <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
         <BarChart3 className="w-5 h-5 text-emerald-600" />
         <div>
-          <h2 className="text-base font-bold text-slate-900">Overall event summary</h2>
+          <h2 className="text-base font-bold text-slate-900">Overall Summary</h2>
           <p className="text-xs text-slate-500 mt-0.5">All selected dates analyzed by inspection event</p>
         </div>
       </div>
@@ -44,15 +44,6 @@ export const OverallEventSummaryTable: React.FC<OverallEventSummaryTableProps> =
                 </tr>
               ))}
             </tbody>
-            <tfoot className="bg-slate-50 border-t-2 border-slate-200">
-              <tr className="font-bold text-slate-800">
-                <td className="px-6 py-3.5">ALL EVENTS</td>
-                <td className="px-4 py-3.5 text-center">{data.reduce((sum, row) => sum + row.total, 0)}</td>
-                <td className="px-4 py-3.5 text-center text-emerald-700">{data.reduce((sum, row) => sum + row.valid, 0)}</td>
-                <td className="px-4 py-3.5 text-center text-rose-700">{data.reduce((sum, row) => sum + row.invalid, 0)}</td>
-                <td className="px-4 py-3.5 text-center">{(() => { const total = data.reduce((sum, row) => sum + row.total, 0); const valid = data.reduce((sum, row) => sum + row.valid, 0); return total ? `${((valid / total) * 100).toFixed(2)}%` : '—'; })()}</td>
-              </tr>
-            </tfoot>
           </table>
         </div>
       )}
