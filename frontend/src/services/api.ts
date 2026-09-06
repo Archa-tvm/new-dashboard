@@ -21,6 +21,30 @@ function buildQuery(params: Record<string, any>): string {
 }
 
 export const api = {
+  async login(username: string, password: string): Promise<{ username: string }> {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Invalid username or password' }));
+      throw new Error(err.detail || 'Invalid username or password');
+    }
+    return res.json();
+  },
+
+  async register(username: string, password: string): Promise<{ username: string }> {
+    const res = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Registration failed' }));
+      throw new Error(err.detail || 'Registration failed');
+    }
+    return res.json();
+  },
+
   // Dashboard
   async getSummary(filters: FilterState): Promise<KpiSummary> {
     const res = await fetch(`${API_BASE}/dashboard/summary${buildQuery(filters)}`);

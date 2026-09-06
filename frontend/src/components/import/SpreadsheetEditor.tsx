@@ -17,7 +17,18 @@ interface SpreadsheetEditorProps {
 }
 
 export const SpreadsheetEditor: React.FC<SpreadsheetEditorProps> = ({ onImport, disabled = false }) => {
-  const [rows, setRows] = useState<SpreadsheetRow[]>(() => Array.from({ length: 6 }, emptyRow));
+  const [rows, setRows] = useState<SpreadsheetRow[]>(() => {
+    try {
+      const saved = localStorage.getItem('inspection-sheet-draft');
+      return saved ? JSON.parse(saved) : Array.from({ length: 6 }, emptyRow);
+    } catch {
+      return Array.from({ length: 6 }, emptyRow);
+    }
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('inspection-sheet-draft', JSON.stringify(rows));
+  }, [rows]);
 
   const updateRow = (index: number, field: keyof SpreadsheetRow, value: string) => {
     setRows(current => current.map((row, rowIndex) => rowIndex === index ? { ...row, [field]: value } : row));
@@ -62,6 +73,7 @@ export const SpreadsheetEditor: React.FC<SpreadsheetEditorProps> = ({ onImport, 
       ['Event', 'Line', 'TimeOfOccurrence', 'status', 'Remarks'],
       ...populatedRows.map(row => [row.event, row.line, row.time, row.status, row.reason])
     ].map(row => row.map(escapeCsv).join(',')).join('\n');
+    localStorage.removeItem('inspection-sheet-draft');
     onImport(new File([csv], 'manual_inspection_sheet.csv', { type: 'text/csv' }));
   };
 

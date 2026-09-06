@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
 import { Cpu, LockKeyhole, UserRound } from 'lucide-react';
+import { api } from '../../services/api';
 
 interface LoginViewProps {
   onLogin: (username: string) => void;
 }
 
-const DEFAULT_USERNAME = 'admin';
-const DEFAULT_PASSWORD = 'inspection123';
-
 export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (username.trim() === DEFAULT_USERNAME && password === DEFAULT_PASSWORD) {
-      onLogin(username.trim());
-      return;
+    setError('');
+    try {
+      const result = mode === 'login'
+        ? await api.login(username, password)
+        : await api.register(username, password);
+      onLogin(result.username);
+    } catch (err: any) {
+      setError(err.message || (mode === 'login' ? 'Invalid username or password.' : 'Registration failed.'));
     }
-    setError('Invalid username or password.');
   };
 
   return (
@@ -31,7 +34,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           </div>
           <p className="text-xs font-bold tracking-[0.2em] text-blue-300 uppercase">Production</p>
           <h1 className="text-2xl font-extrabold tracking-tight mt-1">Inspection Analytics</h1>
-          <p className="text-sm text-slate-300 mt-2">Sign in to continue to the dashboard.</p>
+          <p className="text-sm text-slate-300 mt-2">{mode === 'login' ? 'Sign in to continue to the dashboard.' : 'Create an account to access the dashboard.'}</p>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-5">
           <label className="block">
@@ -49,7 +52,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             </span>
           </label>
           {error && <p className="text-xs font-semibold text-rose-600">{error}</p>}
-          <button type="submit" className="w-full py-2.5 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">Sign in</button>
+          <button type="submit" className="w-full py-2.5 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">{mode === 'login' ? 'Sign in' : 'Create account'}</button>
+          <button type="button" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }} className="w-full text-xs font-semibold text-blue-700 hover:text-blue-900">
+            {mode === 'login' ? 'Create a new account' : 'Back to sign in'}
+          </button>
+          {mode === 'login' && <p className="text-center text-[11px] text-slate-500">Default account: admin / inspection123</p>}
         </form>
       </section>
     </main>

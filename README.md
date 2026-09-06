@@ -61,7 +61,7 @@ An industrial-grade, AI-powered Quality Monitoring & Analytics Platform for manu
 - Username: `admin`
 - Password: `inspection123`
 
-Logging out only ends the browser session. Imported spreadsheets, inspection events, remarks, and summaries remain stored in the database and are available after signing in again.
+Use **Create a new account** on the login screen to register another username and password. Accounts are stored in the backend database with hashed passwords. Logging out only ends the browser session. Imported spreadsheets, inspection events, remarks, and summaries remain stored in the database and are available after signing in again.
 
 ### Free Public Deployment
 This repository includes `render.yaml` for a free Render web service. Create a new Web Service at [render.com](https://render.com), connect this repository, and choose **Blueprint**. Render will build the React frontend and serve it from the FastAPI application. The free service may sleep after inactivity.
