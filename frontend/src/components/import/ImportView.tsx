@@ -29,6 +29,8 @@ export const ImportView: React.FC = () => {
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [customMapping, setCustomMapping] = useState<Record<string, string> | undefined>();
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const pendingFilesRef = useRef<File[]>([]);
+  const [pendingFileCount, setPendingFileCount] = useState(0);
 
   const fetchHistory = async () => {
     try {
@@ -46,6 +48,7 @@ export const ImportView: React.FC = () => {
   const handleFileUpload = async (file: File) => {
     setAnalyzing(true);
     setNotification(null);
+    setCustomMapping(undefined);
     try {
       const { token, preview } = await api.analyzeFile(file);
       setUploadedToken(preview.file_token || token);
@@ -63,17 +66,28 @@ export const ImportView: React.FC = () => {
     }
   };
 
+  const startFileQueue = (files: File[]) => {
+    if (!files.length) return;
+    pendingFilesRef.current = files.slice(1);
+    setPendingFileCount(files.length);
+    handleFileUpload(files[0]);
+  };
+
+  const cancelFileQueue = () => {
+    pendingFilesRef.current = [];
+    setPendingFileCount(0);
+    setShowPreviewModal(false);
+    setShowMapperModal(false);
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileUpload(e.dataTransfer.files[0]);
-    }
+    startFileQueue(Array.from(e.dataTransfer.files));
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFileUpload(e.target.files[0]);
-    }
+    if (e.target.files) startFileQueue(Array.from(e.target.files));
+    e.target.value = '';
   };
 
   const handleConfirmImport = async (skipDuplicates: boolean) => {
@@ -93,10 +107,17 @@ export const ImportView: React.FC = () => {
     setShowProgressModal(false);
     refresh();
     fetchHistory();
-    setNotification({
-      type: 'success',
-      message: 'Inspection records imported and all dashboard metrics successfully recalculated.'
-    });
+    const nextFile = pendingFilesRef.current.shift();
+    if (nextFile) {
+      setPendingFileCount(pendingFilesRef.current.length + 1);
+      handleFileUpload(nextFile);
+    } else {
+      setPendingFileCount(0);
+      setNotification({
+        type: 'success',
+        message: 'All selected date files imported and dashboard metrics recalculated.'
+      });
+    }
   };
 
   const handleQuickDemoLoad = async (batchType: 'batch1' | 'batch2' | 'summary') => {
@@ -136,7 +157,7 @@ export const ImportView: React.FC = () => {
         </div>
       )}
 
-      <SpreadsheetEditor onImport={handleFileUpload} disabled={analyzing || showProgressModal} />
+      <SpreadsheetEditor onImport={file => startFileQueue([file])} disabled={analyzing || showProgressModal} />
 
       {/* Main Upload Dropzone */}
       <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-xs text-center">
@@ -152,22 +173,26 @@ export const ImportView: React.FC = () => {
               ref={fileInputRef}
               onChange={handleFileSelect}
               accept=".xlsx,.xls,.csv"
+              multiple
               className="hidden"
             />
             <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform shadow-xs">
               <UploadCloud className="w-8 h-8" />
             </div>
             <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
-              Drop Excel or CSV file here
+              Drop Excel or CSV files here
             </h3>
             <p className="text-xs text-slate-500 mt-1">
-              or <span className="text-blue-600 font-semibold underline">click to browse</span> from your computer
+              or <span className="text-blue-600 font-semibold underline">click to browse</span> to select one or more date files
             </p>
             <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-semibold">
               <FileSpreadsheet className="w-3.5 h-3.5 text-slate-500" />
               <span>XLSX • XLS • CSV</span>
             </div>
           </div>
+          {pendingFileCount > 1 && (
+            <p className="mt-3 text-xs font-semibold text-blue-700">Processing {pendingFileCount} date files one by one. The summary will include all imported dates.</p>
+          )}
         </div>
 
         {/* Demo Fast-Load Datasets */}
@@ -220,7 +245,7 @@ export const ImportView: React.FC = () => {
           setShowPreviewModal(false);
           setShowMapperModal(true);
         }}
-        onCancel={() => setShowPreviewModal(false)}
+        onCancel={cancelFileQueue}
       />
 
       {previewData && (
@@ -235,7 +260,7 @@ export const ImportView: React.FC = () => {
             setShowMapperModal(false);
             setShowPreviewModal(true);
           }}
-          onCancel={() => setShowMapperModal(false)}
+          onCancel={cancelFileQueue}
         />
       )}
 

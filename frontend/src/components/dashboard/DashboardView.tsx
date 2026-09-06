@@ -49,10 +49,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.2fr)_minmax(420px,0.8fr)] gap-6 items-start">
-        <InspectionSummaryTable data={breakdown} loading={loading} />
-        <OverallEventSummaryTable data={eventSummary} loading={loading} />
-      </div>
+      <InspectionSummaryTable data={breakdown} loading={loading} />
+      <OverallEventSummaryTable data={eventSummary} loading={loading} />
     </div>
   );
 };
