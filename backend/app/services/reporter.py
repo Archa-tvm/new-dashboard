@@ -169,7 +169,7 @@ def generate_pdf_report(report_type: str, db: Session, filters: DashboardFilterP
     )
 
     story = []
-    title_text = f"Production Inspection Analytics – {report_type.replace('_', ' ').title()} Report"
+    title_text = f"Simtra Usecase Analytics – {report_type.replace('_', ' ').title()} Report"
     story.append(Paragraph(title_text, title_style))
     story.append(Paragraph(f"Generated at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')} | AI Vision Quality Control", sub_style))
     story.append(Spacer(1, 15))

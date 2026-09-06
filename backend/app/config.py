@@ -2,7 +2,7 @@ import os
 from pydantic import BaseModel
 
 class Settings(BaseModel):
-    PROJECT_NAME: str = "Production Inspection Analytics"
+    PROJECT_NAME: str = "Simtra Usecase Analytics"
     API_V1_STR: str = "/api"
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./inspection_analytics.db")
     OVERALL_TARGET: float = float(os.getenv("OVERALL_TARGET", "90.0"))

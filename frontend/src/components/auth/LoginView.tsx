@@ -32,8 +32,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center mb-5 shadow-lg shadow-blue-950/40">
             <Cpu className="w-6 h-6" />
           </div>
-          <p className="text-xs font-bold tracking-[0.2em] text-blue-300 uppercase">Production</p>
-          <h1 className="text-2xl font-extrabold tracking-tight mt-1">Inspection Analytics</h1>
+          <p className="text-xs font-bold tracking-[0.2em] text-blue-300 uppercase">Simtra</p>
+          <h1 className="text-2xl font-extrabold tracking-tight mt-1">Usecase Analytics</h1>
           <p className="text-sm text-slate-300 mt-2">{mode === 'login' ? 'Sign in to continue to the dashboard.' : 'Create an account to access the dashboard.'}</p>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-5">

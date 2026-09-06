@@ -68,8 +68,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage, isA
             <Cpu className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="text-[11px] font-bold tracking-widest text-blue-400 uppercase">Production</div>
-            <div className="text-sm font-bold text-white tracking-tight">INSPECTION ANALYTICS</div>
+            <div className="text-[11px] font-bold tracking-widest text-blue-400 uppercase">Simtra</div>
+            <div className="text-sm font-bold text-white tracking-tight">USECASE ANALYTICS</div>
           </div>
         </div>
       </div>

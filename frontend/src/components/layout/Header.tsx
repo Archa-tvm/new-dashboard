@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ username, onLogout }) => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Production Inspection Analytics</h1>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Simtra Usecase Analytics</h1>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               System Online
@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({ username, onLogout }) => {
           </div>
           <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-            AI-Powered Production Line Monitoring & Quality Control
+            Production monitoring and quality control analytics
           </p>
         </div>
 

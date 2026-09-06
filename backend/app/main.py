@@ -20,7 +20,7 @@ with SessionLocal() as startup_db:
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="Production Inspection Analytics - Industrial AI/Vision Inspection System",
+    description="Simtra Usecase Analytics - Production inspection monitoring system",
     version="1.0.0"
 )
 

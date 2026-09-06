@@ -13,7 +13,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ onNavigateToImport, onLo
         <FileSpreadsheet className="w-8 h-8" />
       </div>
 
-      <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-2">Production Inspection Analytics</h2>
+      <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-2">Simtra Usecase Analytics</h2>
       <p className="text-sm font-medium text-slate-700 mb-1">No inspection data available.</p>
       <p className="text-xs text-slate-500 max-w-md mb-6 leading-relaxed">
         Upload an Excel (.xlsx/.xls) or CSV file containing raw vision inspection events to automatically calculate KPIs, trends, and line performance.
