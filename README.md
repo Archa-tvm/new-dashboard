@@ -57,6 +57,12 @@ An industrial-grade, AI-powered Quality Monitoring & Analytics Platform for manu
 - Frontend dashboard: http://localhost:5173
 - Backend API documentation: http://127.0.0.1:8000/docs
 
+### Dashboard Login
+- Username: `admin`
+- Password: `inspection123`
+
+Logging out only ends the browser session. Imported spreadsheets, inspection events, remarks, and summaries remain stored in the database and are available after signing in again.
+
 ### Free Public Deployment
 This repository includes `render.yaml` for a free Render web service. Create a new Web Service at [render.com](https://render.com), connect this repository, and choose **Blueprint**. Render will build the React frontend and serve it from the FastAPI application. The free service may sleep after inactivity.
 

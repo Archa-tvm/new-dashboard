@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCw, Sparkles } from 'lucide-react';
+import { LogOut, RotateCw, Sparkles } from 'lucide-react';
 import { useFilters } from '../../context/FilterContext';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  username: string;
+  onLogout: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ username, onLogout }) => {
   const { lastUpdated, refresh } = useFilters();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(
@@ -53,6 +58,13 @@ export const Header: React.FC = () => {
             <RotateCw className={`w-3.5 h-3.5 text-slate-600 ${isRefreshing ? 'animate-spin text-blue-600' : ''}`} />
             <span>Refresh</span>
           </button>
+
+          <div className="flex items-center gap-2 pl-1 border-l border-slate-200">
+            <span className="text-xs font-semibold text-slate-700">{username}</span>
+            <button onClick={onLogout} title="Log out" className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors">
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </header>

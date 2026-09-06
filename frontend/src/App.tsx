@@ -11,10 +11,21 @@ import { ReportCenter } from './components/reports/ReportCenter';
 import { SettingsView } from './components/settings/SettingsView';
 import { FilterProvider } from './context/FilterContext';
 import { InspectionEvent } from './types';
+import { LoginView } from './components/auth/LoginView';
 
 export const App: React.FC = () => {
+  const [signedInUser, setSignedInUser] = useState<string | null>(() => localStorage.getItem('inspection-dashboard-user'));
   const [currentPage, setCurrentPage] = useState<PageId>('dashboard');
   const [activeDrawerEvent, setActiveDrawerEvent] = useState<InspectionEvent | null>(null);
+
+  if (!signedInUser) {
+    return <LoginView onLogin={username => { localStorage.setItem('inspection-dashboard-user', username); setSignedInUser(username); }} />;
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('inspection-dashboard-user');
+    setSignedInUser(null);
+  };
 
   const renderPage = () => {
     switch (currentPage) {
@@ -56,7 +67,7 @@ export const App: React.FC = () => {
 
         {/* Main Content Workspace (Offset by sidebar width 64 = 16rem = 256px) */}
         <div className="flex-1 ml-64 flex flex-col min-h-screen">
-          <Header />
+          <Header username={signedInUser} onLogout={handleLogout} />
           <FiltersBar />
 
           <main className="flex-1 p-8 overflow-y-auto">

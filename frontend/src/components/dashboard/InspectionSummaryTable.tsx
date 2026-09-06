@@ -15,8 +15,8 @@ export const InspectionSummaryTable: React.FC<InspectionSummaryTableProps> = ({ 
       <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
         <Table2 className="w-5 h-5 text-blue-600" />
         <div>
-          <h2 className="text-base font-bold text-slate-900">Inspection summary</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Automatically calculated from imported date sheets</p>
+          <h2 className="text-base font-bold text-slate-900">Daily Event Summary</h2>
+          <p className="text-xs text-slate-500 mt-0.5">PP, TP, FP, FN, and percentage for every event on every date</p>
         </div>
       </div>
       {!data.length ? (
@@ -40,11 +40,11 @@ export const InspectionSummaryTable: React.FC<InspectionSummaryTableProps> = ({ 
                 <tr key={`${row.date}-${row.event}`} className="hover:bg-slate-50">
                   <td className="px-6 py-3.5 font-semibold text-slate-700">{row.is_first_in_date ? row.formatted_date : ''}</td>
                   <td className="px-4 py-3.5 font-bold text-blue-700">{row.event}</td>
-                  <td className="px-4 py-3.5 text-center font-semibold text-slate-800">{row.pp}</td>
+                  <td className="px-4 py-3.5 text-center font-semibold text-slate-800">{row.pp || ''}</td>
                   <td className="px-4 py-3.5 text-center font-semibold text-emerald-700">{row.tp}</td>
-                  <td className="px-4 py-3.5 text-center font-semibold text-rose-700">{row.fp}</td>
-                  <td className="px-4 py-3.5 text-center text-slate-500">{row.fn ?? 0}</td>
-                  <td className="px-4 py-3.5 text-center font-bold text-slate-900">{row.percentage !== null ? `${row.percentage.toFixed(2)}%` : ''}</td>
+                  <td className="px-4 py-3.5 text-center font-semibold text-rose-700">{row.fp || ''}</td>
+                  <td className="px-4 py-3.5 text-center text-slate-500">{row.pp ? (row.fn ?? 0) : ''}</td>
+                  <td className="px-4 py-3.5 text-center font-bold text-slate-900">{row.percentage !== null ? `${row.percentage.toFixed(2)}%` : '0.00%'}</td>
                 </tr>
               ))}
             </tbody>

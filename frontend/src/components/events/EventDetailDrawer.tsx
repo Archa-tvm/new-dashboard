@@ -79,9 +79,9 @@ export const EventDetailDrawer: React.FC<EventDetailDrawerProps> = ({ event, onC
 
             {!isValid && (
               <div className="pt-2 border-t border-slate-200">
-                <span className="text-rose-600 uppercase font-bold tracking-wider text-[10px]">Failure Reason</span>
+                <span className="text-rose-600 uppercase font-bold tracking-wider text-[10px]">Remarks</span>
                 <div className="mt-0.5 font-bold text-slate-900 capitalize text-sm">
-                  {event.invalid_reason || 'Unnamed'}
+                  {event.invalid_reason === 'Unnamed' ? '' : (event.invalid_reason || '')}
                 </div>
               </div>
             )}

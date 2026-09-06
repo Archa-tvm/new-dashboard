@@ -1,4 +1,5 @@
 import os
+import tempfile
 import pytest
 from datetime import datetime
 from sqlalchemy import create_engine
@@ -123,9 +124,9 @@ def test_invalid_reasons_and_unknown_fallback(db_session):
     total_pct = sum(r.percentage for r in dist)
     assert 99.0 <= total_pct <= 101.0
 
-    # Invalid events without a sheet remark are grouped as 'Unnamed'.
+    # Invalid events without a sheet remark are grouped separately.
     reason_names = [r.reason for r in dist]
-    assert "Unnamed" in reason_names
+    assert "No remark" in reason_names
 
 def test_duplicate_detection_batch2(db_session):
     sample_file = os.path.join(
@@ -147,6 +148,32 @@ def test_duplicate_detection_batch2(db_session):
     kpis = get_kpi_summary(db_session, DashboardFilterParams())
     assert kpis.total_events == 1493
 
+def test_same_time_on_different_dates_is_not_duplicate(db_session):
+    csv_content = "Event,Line,TimeOfOccurrence,status\nOPSPD,Production Line 8,2026-08-01 08:54:04,valid\nOPSPD,Production Line 8,2026-08-02 08:54:04,valid\n"
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False, newline="") as csv_file:
+        csv_file.write(csv_content)
+        csv_path = csv_file.name
+
+    try:
+        batch = execute_import(
+            file_path=csv_path,
+            file_name="different_dates_same_time.csv",
+            column_mapping=None,
+            skip_duplicates=True,
+            db=db_session
+        )
+        assert batch.imported_rows == 2
+        assert batch.duplicate_rows == 0
+        timestamps = db_session.query(InspectionEvent.time_of_occurrence).filter(
+            InspectionEvent.source_import_id == batch.id
+        ).all()
+        assert {timestamp[0].strftime("%Y-%m-%d %H:%M:%S") for timestamp in timestamps} == {
+            "2026-08-01 08:54:04",
+            "2026-08-02 08:54:04"
+        }
+    finally:
+        os.remove(csv_path)
+
 def test_api_endpoints(client):
     r = client.get("/api/health")
     assert r.status_code == 200
@@ -154,7 +181,7 @@ def test_api_endpoints(client):
 
     r = client.get("/api/dashboard/summary")
     assert r.status_code == 200
-    assert r.json()["total_events"] == 1493
+    assert r.json()["total_events"] == 1495
 
     r = client.get("/api/dashboard/highlights")
     assert r.status_code == 200
@@ -170,7 +197,7 @@ def test_api_endpoints(client):
     r = client.get("/api/events?page=1&page_size=10")
     assert r.status_code == 200
     data = r.json()
-    assert data["total"] == 1493
+    assert data["total"] == 1495
     assert len(data["items"]) == 10
 
     # Detail drawer endpoint

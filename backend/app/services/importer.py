@@ -256,8 +256,8 @@ def execute_import(
             reason_final = None # valid records don't need reason
         elif raw_status in ("invalid", "fail", "ng", "false", "0"):
             norm_status = "invalid"
-            # If invalid has no remark, keep it visible as an unnamed reason.
-            reason_final = raw_reason if raw_reason else "Unnamed"
+            # Preserve the sheet remark; an empty remark stays empty.
+            reason_final = raw_reason or None
         else:
             rejected_count += 1
             continue

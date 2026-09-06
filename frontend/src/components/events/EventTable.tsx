@@ -278,7 +278,7 @@ export const EventTable: React.FC<EventTableProps> = ({ onSelectEvent }) => {
                     <ArrowUpDown className="w-3 h-3 text-slate-400" />
                   </div>
                 </th>
-                <th className="py-3 px-3">Invalid Reason</th>
+                <th className="py-3 px-3">Remarks</th>
                 <th className="py-3 px-3">Source File</th>
                 <th className="py-3 px-3 text-center">Row</th>
                 <th className="py-3 px-3 text-right">Action</th>
@@ -329,7 +329,7 @@ export const EventTable: React.FC<EventTableProps> = ({ onSelectEvent }) => {
                         <StatusBadge status={ev.status} size="sm" />
                       </td>
                       <td className="py-2.5 px-3 capitalize text-slate-700 truncate max-w-[160px]">
-                        {ev.invalid_reason || '—'}
+                        {ev.invalid_reason === 'Unnamed' ? '' : (ev.invalid_reason || '')}
                       </td>
                       <td className="py-2.5 px-3 text-slate-500 truncate max-w-[140px]" title={ev.source_file}>
                         {ev.source_file}
