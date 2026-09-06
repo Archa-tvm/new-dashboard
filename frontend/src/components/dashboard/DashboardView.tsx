@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useFilters } from '../../context/FilterContext';
 import { api } from '../../services/api';
-import { EventBreakdownRow, InspectionEvent, KpiSummary } from '../../types';
+import { DailyPerformanceRow, EventBreakdownRow, EventPerformanceCard, InspectionEvent, KpiSummary } from '../../types';
 import { KpiCards } from './KpiCards';
 import { InvalidReasonSection } from './InvalidReasonSection';
 import { EmptyState } from '../common/EmptyState';
 import { InspectionSummaryTable } from './InspectionSummaryTable';
 import { InvalidInspectionsTable } from './InvalidInspectionsTable';
+import { DateTotalsTable } from './DateTotalsTable';
+import { OverallEventSummaryTable } from './OverallEventSummaryTable';
 
 interface DashboardViewProps {
   onNavigateToImport: () => void;
@@ -21,12 +23,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
   const [reasonData, setReasonData] = useState<any>(null);
   const [breakdown, setBreakdown] = useState<EventBreakdownRow[]>([]);
   const [invalidEvents, setInvalidEvents] = useState<InspectionEvent[]>([]);
+  const [dailyTotals, setDailyTotals] = useState<DailyPerformanceRow[]>([]);
+  const [eventSummary, setEventSummary] = useState<EventPerformanceCard[]>([]);
 
   useEffect(() => {
     const loadSummary = async () => {
       setLoading(true);
       try {
-        const [summaryResponse, reasonsResponse, breakdownResponse, invalidEventsResponse] = await Promise.all([
+        const [summaryResponse, reasonsResponse, breakdownResponse, invalidEventsResponse, dailyResponse, eventSummaryResponse] = await Promise.all([
           api.getSummary(appliedFilters),
           api.getInvalidReasons(appliedFilters),
           api.getEventBreakdown(appliedFilters),
@@ -41,12 +45,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
             invalid_reason: appliedFilters.invalid_reason !== 'All Reasons' ? appliedFilters.invalid_reason : undefined,
             sort_by: 'time_of_occurrence',
             sort_order: 'desc'
-          })
+          }),
+          api.getDaily(appliedFilters),
+          api.getEventsSummary(appliedFilters)
         ]);
         setSummary(summaryResponse);
         setReasonData(reasonsResponse);
         setBreakdown(breakdownResponse);
         setInvalidEvents(invalidEventsResponse.items);
+        setDailyTotals(dailyResponse);
+        setEventSummary(eventSummaryResponse);
       } catch (error) {
         console.error('Failed to load inspection summary:', error);
       } finally {
@@ -71,6 +79,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
   return (
     <div className="space-y-6">
       {summary && <KpiCards data={summary} loading={loading} />}
+      <DateTotalsTable data={dailyTotals} loading={loading} />
+      <InspectionSummaryTable data={breakdown} loading={loading} />
+      <OverallEventSummaryTable data={eventSummary} loading={loading} />
       {reasonData && (
         <InvalidReasonSection
           totalInvalid={reasonData.total_invalid || 0}
@@ -78,7 +89,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
           distribution={reasonData.distribution || []}
         />
       )}
-      <InspectionSummaryTable data={breakdown} loading={loading} />
       <InvalidInspectionsTable events={invalidEvents} loading={loading} />
     </div>
   );
