@@ -386,7 +386,7 @@ def get_invalid_reasons_analysis(db: Session, filters: DashboardFilterParams) ->
     # Distribution
     reason_counts = {}
     for ev in invalid_events:
-        r = ev.invalid_reason or "Unknown"
+        r = ev.invalid_reason or "Unnamed"
         reason_counts[r] = reason_counts.get(r, 0) + 1
 
     # Sorted descending
@@ -406,7 +406,7 @@ def get_invalid_reasons_analysis(db: Session, filters: DashboardFilterParams) ->
     # Reasons by event table
     events_breakdown = {}
     for ev in invalid_events:
-        r = ev.invalid_reason or "Unknown"
+        r = ev.invalid_reason or "Unnamed"
         if r not in events_breakdown:
             events_breakdown[r] = {"OPSPD": 0, "HNDPOS": 0, "other": 0, "total": 0}
         events_breakdown[r]["total"] += 1
@@ -449,7 +449,7 @@ def get_invalid_reasons_analysis(db: Session, filters: DashboardFilterParams) ->
         by_date_reasons = {d.strftime("%Y-%m-%d"): {} for d in dates}
         for ev in invalid_events:
             d_str = ev.time_of_occurrence.strftime("%Y-%m-%d")
-            r = ev.invalid_reason or "Unknown"
+            r = ev.invalid_reason or "Unnamed"
             if d_str in by_date_reasons:
                 by_date_reasons[d_str][r] = by_date_reasons[d_str].get(r, 0) + 1
 

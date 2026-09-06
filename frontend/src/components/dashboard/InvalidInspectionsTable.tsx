@@ -40,7 +40,7 @@ export const InvalidInspectionsTable: React.FC<InvalidInspectionsTableProps> = (
                   <td className="px-4 py-3.5 font-mono text-slate-700"><span className="inline-flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-slate-400" />{event.time_str}</span></td>
                   <td className="px-4 py-3.5 font-bold text-blue-700">{event.event}</td>
                   <td className="px-4 py-3.5 text-slate-700">{event.production_line}</td>
-                  <td className="px-4 py-3.5 font-semibold text-rose-700">{event.invalid_reason || 'Unknown'}</td>
+                  <td className="px-4 py-3.5 font-semibold text-rose-700">{event.invalid_reason || 'Unnamed'}</td>
                 </tr>
               ))}
             </tbody>

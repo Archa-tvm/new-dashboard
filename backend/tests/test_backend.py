@@ -123,9 +123,9 @@ def test_invalid_reasons_and_unknown_fallback(db_session):
     total_pct = sum(r.percentage for r in dist)
     assert 99.0 <= total_pct <= 101.0
 
-    # Rule 46: If invalid event has no reason, classify as 'Unknown'
+    # Invalid events without a sheet remark are grouped as 'Unnamed'.
     reason_names = [r.reason for r in dist]
-    assert "Unknown" in reason_names
+    assert "Unnamed" in reason_names
 
 def test_duplicate_detection_batch2(db_session):
     sample_file = os.path.join(
