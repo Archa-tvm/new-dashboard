@@ -21,7 +21,7 @@ function buildQuery(params: Record<string, any>): string {
 }
 
 export const api = {
-  async login(username: string, password: string): Promise<{ username: string }> {
+  async login(username: string, password: string): Promise<{ username: string; role: 'admin' | 'user' }> {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -33,7 +33,7 @@ export const api = {
     return res.json();
   },
 
-  async register(username: string, password: string): Promise<{ username: string }> {
+  async register(username: string, password: string): Promise<{ username: string; role: 'admin' | 'user' }> {
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })

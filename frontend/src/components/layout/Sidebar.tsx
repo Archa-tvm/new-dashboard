@@ -15,9 +15,10 @@ export type PageId = 'dashboard' | 'analytics' | 'events' | 'import' | 'reports'
 interface SidebarProps {
   currentPage: PageId;
   onSelectPage: (page: PageId) => void;
+  isAdmin: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage, isAdmin }) => {
   const mainNav = [
     { id: 'dashboard' as PageId, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'analytics' as PageId, label: 'Analytics', icon: BarChart3 },
@@ -32,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage }) =
   const systemNav = [
     { id: 'settings' as PageId, label: 'Settings', icon: SettingsIcon },
   ];
+  const visibleMainNav = isAdmin ? mainNav : mainNav.filter(item => item.id === 'dashboard');
 
   const renderNavGroup = (items: typeof mainNav) => (
     <ul className="space-y-1">
@@ -76,17 +78,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onSelectPage }) =
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
         <div>
           <div className="px-3 mb-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Main</div>
-          {renderNavGroup(mainNav)}
+          {renderNavGroup(visibleMainNav)}
         </div>
 
         <div>
           <div className="px-3 mb-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Management</div>
-          {renderNavGroup(managementNav)}
+          {isAdmin && renderNavGroup(managementNav)}
         </div>
 
         <div>
           <div className="px-3 mb-2 text-[10px] font-bold tracking-wider text-slate-400 uppercase">System</div>
-          {renderNavGroup(systemNav)}
+          {isAdmin && renderNavGroup(systemNav)}
         </div>
       </div>
 

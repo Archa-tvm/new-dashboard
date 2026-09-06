@@ -36,7 +36,7 @@ def register(credentials: Credentials, db: Session = Depends(get_db)):
     user = UserAccount(username=username, password_hash=hash_password(credentials.password))
     db.add(user)
     db.commit()
-    return {"username": username}
+    return {"username": username, "role": "user"}
 
 @router.post("/login")
 def login(credentials: Credentials, db: Session = Depends(get_db)):
@@ -44,4 +44,4 @@ def login(credentials: Credentials, db: Session = Depends(get_db)):
     user = db.query(UserAccount).filter(UserAccount.username == username).first()
     if not user or not verify_password(credentials.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid username or password")
-    return {"username": user.username}
+    return {"username": user.username, "role": "admin" if user.username == "admin" else "user"}

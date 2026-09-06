@@ -3,7 +3,7 @@ import { Cpu, LockKeyhole, UserRound } from 'lucide-react';
 import { api } from '../../services/api';
 
 interface LoginViewProps {
-  onLogin: (username: string) => void;
+  onLogin: (username: string, role: 'admin' | 'user') => void;
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
@@ -19,7 +19,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
       const result = mode === 'login'
         ? await api.login(username, password)
         : await api.register(username, password);
-      onLogin(result.username);
+      onLogin(result.username, result.role);
     } catch (err: any) {
       setError(err.message || (mode === 'login' ? 'Invalid username or password.' : 'Registration failed.'));
     }
@@ -53,7 +53,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           </label>
           {error && <p className="text-xs font-semibold text-rose-600">{error}</p>}
           <button type="submit" className="w-full py-2.5 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors">{mode === 'login' ? 'Sign in' : 'Create account'}</button>
-          <button type="button" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }} className="w-full text-xs font-semibold text-blue-700 hover:text-blue-900">
+          <button type="button" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }} className="w-full py-2.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 text-sm font-bold hover:bg-blue-100 transition-colors">
             {mode === 'login' ? 'Create a new account' : 'Back to sign in'}
           </button>
           {mode === 'login' && <p className="text-center text-[11px] text-slate-500">Default account: admin / inspection123</p>}

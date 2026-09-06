@@ -15,15 +15,20 @@ import { LoginView } from './components/auth/LoginView';
 
 export const App: React.FC = () => {
   const [signedInUser, setSignedInUser] = useState<string | null>(() => localStorage.getItem('inspection-dashboard-user'));
+  const [userRole, setUserRole] = useState<'admin' | 'user'>(() => {
+    const savedRole = localStorage.getItem('inspection-dashboard-role');
+    return savedRole === 'admin' || localStorage.getItem('inspection-dashboard-user') === 'admin' ? 'admin' : 'user';
+  });
   const [currentPage, setCurrentPage] = useState<PageId>('dashboard');
   const [activeDrawerEvent, setActiveDrawerEvent] = useState<InspectionEvent | null>(null);
 
   if (!signedInUser) {
-    return <LoginView onLogin={username => { localStorage.setItem('inspection-dashboard-user', username); setSignedInUser(username); }} />;
+    return <LoginView onLogin={(username, role) => { localStorage.setItem('inspection-dashboard-user', username); localStorage.setItem('inspection-dashboard-role', role); setSignedInUser(username); setUserRole(role); }} />;
   }
 
   const handleLogout = () => {
     localStorage.removeItem('inspection-dashboard-user');
+    localStorage.removeItem('inspection-dashboard-role');
     setSignedInUser(null);
   };
 
@@ -60,6 +65,7 @@ export const App: React.FC = () => {
         {/* Fixed Navy Sidebar */}
         <Sidebar
           currentPage={currentPage}
+          isAdmin={userRole === 'admin'}
           onSelectPage={(p) => setCurrentPage(p)}
         />
 
