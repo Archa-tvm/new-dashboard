@@ -33,8 +33,6 @@ export const App: React.FC = () => {
         return (
           <DashboardView
             onNavigateToImport={() => setCurrentPage('import')}
-            onNavigateToEvents={() => setCurrentPage('events')}
-            onSelectEvent={(ev) => setActiveDrawerEvent(ev)}
           />
         );
       case 'analytics':
