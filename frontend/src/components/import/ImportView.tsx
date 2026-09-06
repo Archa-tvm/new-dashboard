@@ -13,6 +13,7 @@ import { DataPreviewModal } from './DataPreviewModal';
 import { ColumnMapperModal } from './ColumnMapperModal';
 import { ImportProgressModal } from './ImportProgressModal';
 import { ImportHistoryTable } from './ImportHistoryTable';
+import { SpreadsheetEditor } from './SpreadsheetEditor';
 import { useFilters } from '../../context/FilterContext';
 
 export const ImportView: React.FC = () => {
@@ -134,6 +135,8 @@ export const ImportView: React.FC = () => {
           <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-slate-600">✕</button>
         </div>
       )}
+
+      <SpreadsheetEditor onImport={handleFileUpload} disabled={analyzing || showProgressModal} />
 
       {/* Main Upload Dropzone */}
       <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-xs text-center">

@@ -160,6 +160,13 @@ def test_api_endpoints(client):
     assert r.status_code == 200
     assert len(r.json()["insights"]) > 0
 
+    r_summary = client.get("/api/dashboard/event-breakdown")
+    assert r_summary.status_code == 200
+    first_summary = r_summary.json()[0]
+    assert first_summary["pp"] == first_summary["tp"] + first_summary["fp"]
+    assert first_summary["fn"] == 0
+    assert first_summary["percentage"] == round((first_summary["tp"] / first_summary["pp"]) * 100, 2)
+
     r = client.get("/api/events?page=1&page_size=10")
     assert r.status_code == 200
     data = r.json()

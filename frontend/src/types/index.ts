@@ -68,7 +68,7 @@ export interface EventBreakdownRow {
   pp: number;
   tp: number;
   fp: number;
-  fn: string | null;
+  fn: number | null;
   percentage: number | null;
 }
 

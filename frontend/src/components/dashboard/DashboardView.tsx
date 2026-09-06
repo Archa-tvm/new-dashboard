@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useFilters } from '../../context/FilterContext';
 import { api } from '../../services/api';
-import { InspectionEvent, KpiSummary } from '../../types';
+import { EventBreakdownRow, InspectionEvent, KpiSummary } from '../../types';
 import { KpiCards } from './KpiCards';
 import { InvalidReasonSection } from './InvalidReasonSection';
 import { EmptyState } from '../common/EmptyState';
+import { InspectionSummaryTable } from './InspectionSummaryTable';
 
 interface DashboardViewProps {
   onNavigateToImport: () => void;
@@ -17,17 +18,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<KpiSummary | null>(null);
   const [reasonData, setReasonData] = useState<any>(null);
+  const [breakdown, setBreakdown] = useState<EventBreakdownRow[]>([]);
 
   useEffect(() => {
     const loadSummary = async () => {
       setLoading(true);
       try {
-        const [summaryResponse, reasonsResponse] = await Promise.all([
+        const [summaryResponse, reasonsResponse, breakdownResponse] = await Promise.all([
           api.getSummary(appliedFilters),
-          api.getInvalidReasons(appliedFilters)
+          api.getInvalidReasons(appliedFilters),
+          api.getEventBreakdown(appliedFilters)
         ]);
         setSummary(summaryResponse);
         setReasonData(reasonsResponse);
+        setBreakdown(breakdownResponse);
       } catch (error) {
         console.error('Failed to load inspection summary:', error);
       } finally {
@@ -59,6 +63,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToImport
           distribution={reasonData.distribution || []}
         />
       )}
+      <InspectionSummaryTable data={breakdown} loading={loading} />
     </div>
   );
 };

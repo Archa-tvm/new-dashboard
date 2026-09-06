@@ -63,7 +63,7 @@ class EventBreakdownRow(BaseModel):
     pp: int
     tp: int
     fp: int
-    fn: Optional[str] = None
+    fn: Optional[int] = 0
     percentage: Optional[float] = None
 
 # Monthly accuracy row grouped by month and inspection event

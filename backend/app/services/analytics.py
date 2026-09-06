@@ -755,7 +755,7 @@ def get_event_breakdown_table(db: Session, filters: DashboardFilterParams) -> Li
                 pp=pp,
                 tp=tp,
                 fp=fp,
-                fn=None,
+                fn=0,
                 percentage=pct
             ))
 
